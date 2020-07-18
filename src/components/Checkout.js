@@ -1,5 +1,6 @@
 import React from 'react';
 import { isAuthenticated, getCartProducts } from '../repository';
+import PaypalButtons from "./PaypalButton";
 import {  Redirect, Link } from 'react-router-dom';
 
 export default class Checkout extends React.Component {
@@ -7,9 +8,14 @@ export default class Checkout extends React.Component {
 		super(props);
 		this.state = {
 			products: [],
-			total: 0
+			total: 0,
+			showPaypal: false
 		}
 	}
+
+	showPaypalButtons = () => {
+    this.setState({ showPaypal: true });
+  };
 
 	componentWillMount() {
 		let cart = localStorage.getItem('cart');
@@ -25,7 +31,8 @@ export default class Checkout extends React.Component {
 
 	render() {
 		if (!isAuthenticated()) return (<Redirect to="/login" />);
-		const { products, total } =  this.state;
+		const { products, total, showPaypal } =  this.state;
+		if (showPaypal) return (<PaypalButtons />);
 		return (
 			<div className=" container">
 				<h3 className="card-title">Checkout</h3>
@@ -44,7 +51,7 @@ export default class Checkout extends React.Component {
 				<hr/>
 				{ products.length ? <div><h4><small>Total Amount:</small><span className="float-right text-primary">₹{total}</span></h4><hr/></div>: ''}
 				{ !products.length ? <h3 className="text-warning">No item on the cart</h3>: ''}
-				{ products.length ? <button className="btn btn-success float-right" onClick={() => alert('Proceed to Pay')}>Pay</button>: '' }
+				{ products.length? <button className="btn btn-success float-right" onClick={this.showPaypalButtons}>Pay</button>: '' }
 				<Link to="/"><button className="btn btn-danger float-right" style={{ marginRight: "10px" }}>Cancel</button></Link>
 				<br/><br/><br/>
 			</div>
